@@ -1,19 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import App from 'App';
+import reportWebVitals from 'utils/reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+const renderApp = () => {
+	root.render(
+		<React.StrictMode>
+			<App />
+		</React.StrictMode>
+	);
+};
+
+if (Boolean(process.env.REACT_APP_ENABLE_MSW)) {
+	import(/* webpackChunkName: "msw"*/ './utils/msw').then(async ({ worker }) => {
+		await worker.start({ serviceWorker: { url: '/mockServiceWorker.js' } });
+		renderApp();
+	});
+} else {
+	renderApp();
+}
+
 reportWebVitals();
